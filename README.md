@@ -13,6 +13,8 @@ This project combines **theoretical analysis** with **numerical simulations** to
 📄 **Full Project Report:** [Click here to view the PDF](./project%201.pdf)
 
 ---
+## Reflection on theoretical part
+We found exact solution using the separation of variables $\psi(x, t) = X(x)T(t),$, for details look at 
 
 ## Reflection on numerical methods being used
 
