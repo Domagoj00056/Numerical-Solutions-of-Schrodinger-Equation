@@ -97,10 +97,14 @@ $$
 ## Key Findings
 
 - The Schrödinger equation requires conservation of probability:
-  
-  $$
-  \sum_k |\psi_k^n|^2 = \text{constant}
-  $$
+
+$$
+\int_0^1 |u(x,t)|^2 \, dx = \int_0^1 |u_0(x)|^2 \, dx
+$$
+
+$$
+\sum_k |\psi_k^n|^2 = \text{constant}
+$$
 
 - The **FTCS and BTCS schemes** fails to conserve norm  
 - The **Crank–Nicolson method** preserves norm, making it physically reliable  
