@@ -14,13 +14,29 @@ This project combines **theoretical analysis** with **numerical simulations** to
 
 ---
 ## Reflection on theoretical part
-We found exact solution using the separation of variables $\psi(x, t) = X(x)T(t),$, for details look [click here](./project%201.pdf). 
+
+An analytical solution was obtained using the method of separation of variables, assuming a solution of the form $\psi(x,t) = X(x)T(t)$. This provided a foundation for understanding the behaviour of the equation and served as a benchmark for numerical methods.
+
+From this, we established the **mass conservation** property for Schrödinger-type equations:
 
 $$
 \int_0^1 |u(x,t)|^2 \, dx = \int_0^1 |u_0(x)|^2 \, dx
 $$
 
-The above relation is known as the **mass conservation** for Schrödinger-type equations.
+This reflects the physical principle that total probability is preserved over time.
+
+Furthermore, we proved **discrete mass conservation** for the Crank–Nicolson method when applied to the Schrödinger equation:
+
+$$
+\Delta x \sum_{k=0}^{k_m} |U_k^n|^2 = \Delta x \sum_{k=0}^{k_m} |u_0(x_k)|^2
+$$
+
+showing that the numerical scheme preserves this key physical property at the discrete level.
+
+The theoretical analysis also includes **Von Neumann stability analysis using Fourier modes** and **consistency analysis**. For full details, see the report:
+
+📄 [Click here to view the PDF](./project%201.pdf)
+
 
 ## Reflection on numerical methods being used
 
