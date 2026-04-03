@@ -17,7 +17,7 @@ This project combines **theoretical analysis** with **numerical simulations** to
 
 An analytical solution was obtained using the method of separation of variables, assuming a solution of the form $\psi(x,t) = X(x)T(t)$. This provided a foundation for understanding the behaviour of the equation and served as a benchmark for numerical methods.
 
-From this, we established the **mass conservation** property for Schrödinger-type equations:
+Then, we established the **mass conservation** property for Schrödinger-type equations:
 
 $$
 \int_0^1 |u(x,t)|^2 \, dx = \int_0^1 |u_0(x)|^2 \, dx
@@ -33,9 +33,7 @@ $$
 
 showing that the numerical scheme preserves this key physical property at the discrete level.
 
-The theoretical analysis also includes **Von Neumann stability analysis using Fourier modes** and **consistency analysis**. For full details, see the report:
-
-📄 [Click here to view the PDF](./project%201.pdf)
+The theoretical analysis also includes **Von Neumann stability analysis using Fourier modes** and **consistency analysis**. For full details, see the report: [Click here to view the PDF](./project%201.pdf)
 
 
 ## Reflection on numerical methods being used
