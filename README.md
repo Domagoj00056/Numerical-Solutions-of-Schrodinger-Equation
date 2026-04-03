@@ -45,7 +45,7 @@ The following finite difference schemes were implemented and analysed:
 ### FTCS Method
 
 - First-order accurate in time  
-- Conditionally stable  
+- unconditionally unstable  
 - Does not conserve norm  
 - Can become unstable for large time steps  
 
@@ -94,17 +94,7 @@ $$
 
 ---
 
-## 📊 Key Findings
-
-### Stability and Accuracy
-
-- The **explicit scheme** is conditionally stable and becomes unstable for large $\Delta t$  
-- The **implicit (BTCS) scheme** is unconditionally stable but less accurate  
-- The **Crank–Nicolson method** provides the best balance of stability and accuracy  
-
----
-
-### Physical Properties
+## Key Findings
 
 - The Schrödinger equation requires conservation of probability:
   
@@ -112,18 +102,6 @@ $$
   \sum_k |\psi_k^n|^2 = \text{constant}
   $$
 
-- The **explicit scheme** fails to conserve norm  
+- The **FTCS and BTCS schemes** fails to conserve norm  
 - The **Crank–Nicolson method** preserves norm, making it physically reliable  
 
----
-
-### Overall Observations
-
-- There is a trade-off between:
-  - Stability  
-  - Accuracy  
-  - Computational cost  
-
-- Higher-order methods provide better accuracy but require solving systems of equations  
-
-- Preserving physical properties (such as norm conservation) is essential when solving quantum equations numerically  
