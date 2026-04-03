@@ -14,7 +14,13 @@ This project combines **theoretical analysis** with **numerical simulations** to
 
 ---
 ## Reflection on theoretical part
-We found exact solution using the separation of variables $\psi(x, t) = X(x)T(t),$, for details look at 
+We found exact solution using the separation of variables $\psi(x, t) = X(x)T(t),$, for details look [click here](./project%201.pdf). 
+
+$$
+\int_0^1 |u(x,t)|^2 \, dx = \int_0^1 |u_0(x)|^2 \, dx
+$$
+
+The above relation is known as the **mass conservation** for Schrödinger-type equations.
 
 ## Reflection on numerical methods being used
 
