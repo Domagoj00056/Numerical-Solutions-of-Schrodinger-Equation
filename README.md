@@ -42,7 +42,7 @@ The following finite difference schemes were implemented and analysed:
 
 ---
 
-### Explicit Scheme
+### FTCS Method
 
 - First-order accurate in time  
 - Conditionally stable  
