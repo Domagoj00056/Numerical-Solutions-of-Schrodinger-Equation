@@ -1,9 +1,5 @@
 # Numerical-Solutions-of-Schrodinger-Equation
 
-[Click here to view the PDF](./project%201.pdf)
-
-# Numerical-Solutions-of-Schrodinger-Equation
-
 ## 📖 Overview
 This project investigates the numerical solution of the **time-dependent Schrödinger equation** using finite difference methods. The focus is on analysing **stability, accuracy, and conservation properties** of different numerical schemes.
 
