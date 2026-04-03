@@ -1,0 +1,233 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import solve_banded
+
+def initial_condition(x):
+    return 0.8 * np.sin(np.pi * x) + 0.7 * np.exp(-i * np.pi / 7) * np.sin(3 * np.pi * x)
+
+def exact_solution(x, t):
+    return (0.8 * np.sin(np.pi * x) * np.exp(-i * t * (v0 + np.pi ** 2)) 
+            + 0.7 * np.sin(3 * np.pi * x) * np.exp(-i * t * (v0 + 9 * np.pi ** 2) - i * np.pi / 7))
+
+def ftcs(u0,v0, dx, dt, tsteps):
+    U = np.zeros((tsteps, len(u0)), dtype=complex)  
+
+    U[0] = u0           # set initial condition
+    U[:,0] = u0[0]      # set left boundary condition
+    U[:,-1] = u0[-1]    # set right boundary condition
+
+    A = dt/(dx)**2
+    B = v0*dt
+
+    for t in range(tsteps-1):
+
+        u_k = U[t, 1 : -1]       
+        u_right = U[t, 2:]
+        u_left = U[t, : -2]
+
+        U[t+1, 1:-1] = u_k + i * (A * (u_right - 2 * u_k + u_left) - B * u_k)
+
+    return U
+
+def DuFortFrankel(u0,v0, dx, dt, tsteps,start=True):                           
+    if start:   # use ftcs() for first time iteration
+        u0 = ftcs(u0,v0,dx,dt,2)
+        
+    U = np.zeros((tsteps, len(u0[0])), dtype=complex)  
+    
+    U[0:2] = u0         # set initial condition
+    U[:,0] = u0[0,0]    # set left boundary condition
+    U[:,-1] = u0[0,-1]  # set right boundary condition
+
+    A = i * dt / (dx) ** 2
+    B = i * v0 * dt
+    C = (1 - 2 * A-B) / (1 + 2 * A + B)
+    D = (2 * A) / (1 + 2 * A + B)
+
+    for t in range(1,tsteps-1):
+        
+        u_right = U[t, 2:] 
+        u_left = U[t,: -2]
+        u_prev = U[t-1, 1: -1]
+
+        U[t + 1, 1: -1] = C * u_prev + D * (u_right + u_left)
+    
+    return U   
+
+def btcs(u0, v0, dx, dt, tsteps):
+    nx = len(u0)
+    U = np.zeros((tsteps, nx), dtype=complex)
+    U[0] = u0
+
+    # coefficients (independent of U(t,x))
+    A = dt / (dx**2)   
+    B = 1 + 1j * (2 * A + dt * v0)
+
+    ab = np.zeros((3, nx), dtype=complex)
+    ab[0, 1:] = -1j * A      # upper diagonal
+    ab[1, :]  = B          # main diagonal
+    ab[2, :-1] = -1j * A     # lower diagonal
+
+    for t in range(tsteps - 1):
+        U_next = solve_banded((1,1), ab, U[t])
+
+        # boundary conditions
+        U_next[0] = u0[0]
+        U_next[-1] = u0[-1]
+
+        U[t + 1] = U_next
+
+    return U
+
+def CrankNicolson(u0, v0, dx, dt, tsteps):
+    nx = len(u0)
+    U = np.zeros((tsteps, nx), dtype=complex)
+    U[0] = u0
+
+    # coefficients (independent of U(t,x))
+    A = dt / (2 * dx ** 2) 
+    B = dt * v0 / 2        
+
+    ab = np.zeros((3, nx), dtype=complex)
+    ab[0, 1:] = -1j * A              # upper diagonal
+    ab[1, :]  = 1 + 2j * A + 1j * B    # main diagonal
+    ab[2, :-1] = -1j * A             # lower diagonal
+
+    N = np.diag([1 - 2j * A - 1j * B] * nx)
+    N += np.diag([1j * A] * (nx -1), k=1)
+    N += np.diag([1j * A] * (nx -1), k=-1)
+
+    for t in range(tsteps - 1):
+        rhs = N @ U[t]
+        U_next = solve_banded((1,1), ab, rhs)
+
+        # boundary conditions
+        U_next[0] = u0[0]
+        U_next[-1] = u0[-1]
+
+        U[t+1] = U_next
+
+    return U
+
+def wrapper(v0, T, dx, dt, method, **method_kwargs):
+    x = np.arange(0, 1 + dx, dx)
+    N = len(x)
+
+    tsteps = int(T / dt) + 1
+    t = np.linspace(0, T, tsteps)
+
+    # Initial condition
+    u0 = initial_condition(x)
+
+    # Exact solution
+    U_exact = np.zeros((tsteps, N), dtype=complex)
+    for n in range(tsteps):
+        U_exact[n] = exact_solution(x, t[n])
+
+    # Numerical method 
+    U_num = method(u0, v0, dx, dt, tsteps, **method_kwargs)
+    
+    return x, t, U_exact, U_num
+
+def compute_error_all(U_exact, U_num, dx, idx):
+    error = U_exact[idx] - U_num[idx]
+
+    # Pointwise errors
+    error_abs = np.abs(error)
+    error_real = np.abs(np.real(error))
+    error_imag = np.abs(np.imag(error))
+
+    # Global metrics
+    L2 = np.sqrt(np.sum(error_abs ** 2) * dx)
+    Linf = np.max(error_abs)
+
+    return error_abs, error_real, error_imag, L2, Linf
+
+def plot_error(x, error_abs, error_real, error_imag, method_name, T):
+    plt.figure(figsize=(8,5))
+
+    plt.plot(x, error_abs, label="|Error| (total)")
+    plt.plot(x, error_real, '--', label="Real error")
+    plt.plot(x, error_imag, ':', label="Imag error")
+
+    plt.xlabel("x")
+    plt.ylabel("Error")
+    plt.title(f"{method_name} Error at t = {T}")
+    plt.legend()
+    plt.grid()
+
+    plt.show()
+
+def plot_error_comparison(x, t, U_exact, U_num, dx, method_name, T):
+    idx_mid = np.argmin(np.abs(t - 0.25))
+    idx_final = -1
+
+    # t ≈ 0.25 ----
+    err_abs, err_real, err_imag, L2_mid, Linf_mid = compute_error_all(
+        U_exact, U_num, dx, idx_mid
+    )
+    plot_error(x, err_abs, err_real, err_imag, method_name, t[idx_mid])
+
+    # t = T 
+    err_abs, err_real, err_imag, L2_final, Linf_final = compute_error_all(
+        U_exact, U_num, dx, idx_final
+    )
+    plot_error(x, err_abs, err_real, err_imag, method_name, T)
+
+    return (L2_mid, Linf_mid), (L2_final, Linf_final)
+
+def full_analysis(v0, T, dx, dt, method, method_name, **method_kwargs):
+    # Solve Once
+    x, t, U_exact, U_num = wrapper(v0, T, dx, dt, method, **method_kwargs)
+    dx_val = x[1] - x[0]
+
+    idx_mid = np.argmin(np.abs(t - 0.25))
+    idx_final = -1
+
+    # Real Part Plot
+    for idx, time_label in [(idx_mid, f"{t[idx_mid]:.3f}"), (idx_final, f"{T}")]:
+        plt.figure(figsize=(8,5))
+        plt.plot(x, np.real(U_exact[idx]), label="Exact")
+        plt.plot(x, np.real(U_num[idx]), '--', label=method_name)
+
+        plt.xlabel("x")
+        plt.ylabel("Re(u)")
+        plt.title(f"{method_name}: Real part at t = {time_label}")
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+    # Error
+    (L2_mid, Linf_mid), (L2_final, Linf_final) = plot_error_comparison(
+        x, t, U_exact, U_num, dx_val, method_name, T
+    )
+
+    print("="*40)
+    print(f"{method_name} (dx={dx:.1e}, dt={dt:.1e})")
+    print(f"t ≈ 0.25 → L2 = {L2_mid:.3e}, Linf = {Linf_mid:.3e}")
+    print(f"t = {T}  → L2 = {L2_final:.3e}, Linf = {Linf_final:.3e}")
+    print("="*40, "\n")
+experiments = [
+    ("FTCS", ftcs, 1e-2, 5e-3, {}),
+    ("Crank–Nicolson", CrankNicolson, 1e-3, 1e-3, {}),
+    ("BTCS", btcs, 1e-3, 5e-3, {}),   
+]
+
+for name, method, dx, dt, kwargs in experiments:
+    # Run solver
+    x, t, U_exact, U_num = wrapper(v0, T, dx, dt, method, **kwargs)
+
+    dx_val = x[1] - x[0]
+
+    # Compute mass
+    mass = [dx_val * np.sum(np.abs(U_num[n])**2) for n in range(len(t))]
+
+    # Plot
+    plt.figure(figsize=(8,5))
+    plt.plot(t, mass)
+    plt.xlabel("t")
+    plt.ylabel("Mass")
+    plt.title(f"{name}: Discrete mass (dt={dt:.1e}, dx={dx:.1e})")
+    plt.grid()
+    plt.show()
