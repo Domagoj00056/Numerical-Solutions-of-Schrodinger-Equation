@@ -63,10 +63,7 @@ $$
 - Sensitive to the choice of $\Delta t$ and $\Delta x$  
 
 $$
-\textbf{DuFort--Frankel Method:} \quad 
-\frac{\psi_k^{n+1} - \psi_k^{n-1}}{2\Delta t} 
-= i \frac{\psi_{k+1}^n - (\psi_k^{n+1} + \psi_k^{n-1}) + \psi_{k-1}^n}{(\Delta x)^2} 
-- i V_0 \frac{\psi_k^{n+1} + \psi_k^{n-1}}{2}
+\textbf{DuFort--Frankel Method:} \quad \frac{\psi_k^{n+1} - \psi_k^{n-1}}{2\Delta t} = i \frac{\psi_{k+1}^n - (\psi_k^{n+1} + \psi_k^{n-1}) + \psi_{k-1}^n}{(\Delta x)^2} - i V_0 \frac{\psi_k^{n+1} + \psi_k^{n-1}}{2}
 $$
 
 ### Implicit Scheme (BTCS)
