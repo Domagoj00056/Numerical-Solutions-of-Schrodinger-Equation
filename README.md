@@ -75,6 +75,7 @@ $$
 ### Physical Properties
 
 - The Schrödinger equation requires conservation of probability:
+  
   $$
   \sum_k |\psi_k^n|^2 = \text{constant}
   $$
